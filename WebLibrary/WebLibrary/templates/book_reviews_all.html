@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Book Reviews{% endblock %}
+
+{% block content %}
+<div class="container px-4 px-lg-5 mt-5">
+  <h2 class="fw-bolder mb-4 reviews">Reviews for <a href="{% url 'book_detail' book.slug %}"> {{ book.title }} </a> </h2>
+            {% for review in reviews.object_list %}
+            <div class="h-100 my-4">
+            <!--<div class="comment-info container px-4 px-lg-5 mt-1">{{ review.created_date|date:"D, f" }}</div>-->
+            <div class="comment-info container px-4 px-lg-3 mt-1">
+            <strong>Review from {{ review.user }}</strong>
+            <strong style="color: #198754;">{% if review.is_approved %} Approved{% else %} Unapproved{% endif %}</strong>
+            </div>
+            <!--<hr style="width:100%;text-align:left;margin-left:0">-->
+            <div class="review comment-info container px-4 px-lg-3 mt-1">
+            <blockquote class="reviews">{{ review.text|truncatewords:50 }} <a href="{% url 'book_review_all' book.slug review.review_id%}">Read more</a>
+<!--                <a href="#" style="color: #198754;">{% if review.is_approved %}Unapprove review{% else %}Approve review{% endif %}</a>-->
+            </blockquote>
+            </div>
+            </div>
+
+
+
+            {% empty %}
+            <p>No reviews here yet :(</p>
+            {% endfor %}
+            {% if reviews.paginator.num_pages > 1 %}
+            <div class="pagination">
+                <span class="step-links">
+                {% if reviews.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ reviews.previous_page_number }}">previous</a>
+                    {% endif %}
+
+                    <span class="current">
+                    Page {{ reviews.number }} of {{ reviews.paginator.num_pages }}.
+                    </span>
+
+                    {% if reviews.has_next %}
+                    <a href="?page={{ reviews.next_page_number }}">next</a>
+                    <a href="?page={{ reviews.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+                </span>
+            </div>
+            {% endif %}
+            </div>
+{% endblock %}

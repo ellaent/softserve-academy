@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+        <section class="py-5">
+            <div class="container px-4 px-lg-5 my-5">
+                <div class="row gx-4 gx-lg-5 align-items-center">
+                    {% if book.cover %}
+                    <div class="col-md-6"><img class="card-img-top mb-5 mb-md-0" width="400" height="580" src="{{ book.cover.url }}" alt="..." /></div>
+                    {% else %}
+                    <div class="col-md-6"><img class="card-img-top mb-5 mb-md-0" width="400" height="580" src="https://clipartix.com/wp-content/uploads/2016/08/Questions-magical-clipart-free-question-mark-clip-art-graphics-and-images.png" alt="..." /></div>
+                    {% endif %}
+                    <div class="col-md-6">
+                        <div class="small mb-1">{{ book.authors.all|join:", " }}</div>
+                        <h1 class="display-5 fw-bolder">{{ book.title }}</h1>
+                        <div class="fs-5 mb-2">
+                        <!--<div {% if reviews_count > 0 %} class="fs-5 mb-2" {% else %} class="fs-5 mb-5" {% endif %}>-->
+                            <span>{{ book.genres.all|join:", " }}</span>
+                        </div>
+                        {% if user.is_authenticated %}
+                        <div class="row">
+                        {% if reviews_count > 0 %}
+                        <div class="col-sm">
+                        <div class="fs-5 mb-5 reviews">
+                            <a href="{% url 'book_reviews' book.slug %}">Reviews ({{ reviews_count }})</a>
+                        </div>
+                        </div>
+                        {% endif %}
+                        <div {% if reviews_count == 0 %} class="fs-5 mb-5 col-sm" {% else %} class="col-sm" {% endif %}>
+                        <a href="{% url 'book_review_create' book.slug %}" class="btn btn-outline-success my-2 my-sm-0">Send review for approval</a>
+                        </div>
+                        </div>
+                        {% endif %}
+                        <p class="lead">{{ book.description }}</p>
+                        {% if request.session.edit_mode == 'edit' %}
+                            <a href="{% url 'book_update' book.slug %}" class="btn btn-outline-success my-2 my-sm-0">Edit</a>
+                            <a href="{% url 'book_delete' book.slug %}" class="btn btn-outline-success my-2 my-sm-0">Delete</a>
+                            <a href="{% url 'all_book_reviews' book.slug %}" class="btn btn-outline-success my-2 my-sm-0">See all reviews</a>
+                        {% endif %}
+                        <div class="container px-0 my-3">
+                            <div class="row gx-4 gx-lg-5 align-items-center">
+                                <!--<h6>Likes {{ book.likes.count }}</h6>-->
+                                {% if user.is_authenticated %}
+                                <form class="like" action="{% url 'like_toggle' book.slug %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="user" value="{{ user.id }}">
+                                <input type="hidden" name="book" value="{{ book.book_id }}">
+                                <button type="submit" class="btn {% if liked == True %} dislike-outline-success {% else %} like-outline-success {% endif %} my-2 my-sm-0">{% if liked == True %} Liked {% else %} Like {% endif %} ({{ book.likes.count }})</button>
+                                </form>
+                                {% else %}
+                                <div class="btn" style="background-color:Tomato; color:#fff;">Liked: {{ book.likes.count }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="py-5 bg-light">
+            {% if user.is_authenticated %}
+            <form class="d-flex form-inline my-2 my-lg-0 mx-sm-3" method="post" action="{% url 'comment_product' book.slug %}">
+            {% csrf_token %}
+            <input type="hidden" name="book_slug" value="{{ book.slug }}">
+            <input type="hidden" name="user_id" value="{{ user.id }}">
+            <input class="form-control mr-sm-2" type="text" name="text">
+            <button class="btn btn-outline-success my-2 my-sm-2 mx-sm-3" type="submit" value="{{ book.slug }}"name="comment_button">Submit Comment</button>
+            </form>
+            {% else %}
+            <div class="card-group gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+            <div>
+            <span class="d-flex align-items-center text-center p-3 pt-50">You have to be logged in to leave comments. You can sign upor login.</span>
+            <div class="card-group p-3 pt-50 align-items-center bg-transparent justify-content-center">
+                <div class="d-flex text-center p-3 pt-50"><a class="btn btn-outline-dark mt-auto" href="{% url 'login' %}">Login</a></div>
+                <div class="d-flex text-center p-3 pt-50"><a class="btn btn-outline-dark mt-auto" href="{% url 'signup' %}">Sign Up</a></div>
+            </div>
+            </div>
+            </div>
+            {% endif %}
+            <div class="container px-4 px-lg-5 mt-5">
+                <h2 class="fw-bolder mb-4">Comments</h2>
+            {% for comment in comments.object_list %}
+            <div class="card h-100 my-4" >
+            <div class="comment-info container px-4 px-lg-5 mt-1">{{ comment.created_date|date:"D, f" }}</div>
+            <div class="comment-info container px-4 px-lg-5 mt-1">
+            <strong>{{ comment.user }}</strong>
+            </div>
+            <hr style="width:100%;text-align:left;margin-left:0">
+            <div class="comment-info container px-4 px-lg-5 mt-1">
+            <p>{{ comment.text }}</p>
+                <form action="{% url 'comment_product' book.slug %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="book_slug" value="{{ book.slug }}">
+                <input type="hidden" name="user_id" value="{{ user.id }}">
+                <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                <input class="form-control mr-sm-2" type="text" name="text">
+                <button class="btn btn-outline-success my-2 my-sm-2 mx-sm-3" type="submit" value="{{ comment.id }}"name="comment_button">Reply</button>
+<!--                -->
+<!--                <input class="btn btn-primary" type="submit" value="Replay">-->
+                </form>
+<!--            <hr style="width:100%;text-align:left;margin-left:0">-->
+            </div>
+            </div>
+
+                {% for reply in comment.replies.all %}
+                <div class="card h-100 my-4 ms-sm-5" style="background-color: #f8f9fa;">
+                    <div class="comment-info container px-4 px-lg-5 mt-1">{{ reply.created_date|date:"D, f" }}</div>
+                    <div class="comment-info container px-4 px-lg-5 mt-1">
+                    <strong>{{ reply.user }}</strong>
+                    </div>
+                    <hr style="width:100%;text-align:left;margin-left:0">
+                    <div class="comment-info container px-4 px-lg-5 mt-1">
+                    <p>{{ reply.text }}</p>
+                    </div>
+                </div>
+<!--                <p class="info">{{ reply.user }} | {{ reply.created_date|date:"D, f" }}</p>-->
+<!--                <li>{{ reply.text }}</li>-->
+                {% endfor %}
+
+
+
+            {% empty %}
+            <p>No comments here yet :(</p>
+            {% endfor %}
+            {% if comments.paginator.num_pages > 1 %}
+            <div class="pagination">
+                <span class="step-links">
+                {% if comments.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ comments.previous_page_number }}">previous</a>
+                    {% endif %}
+
+                    <span class="current">
+                    Page {{ comments.number }} of {{ comments.paginator.num_pages }}.
+                    </span>
+
+                    {% if comments.has_next %}
+                    <a href="?page={{ comments.next_page_number }}">next</a>
+                    <a href="?page={{ comments.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+                </span>
+            </div>
+            {% endif %}
+            </div>
+        </section>
+        <!-- Related items section-->
+        <section class="py-5 bg-light">
+            <div class="container px-4 px-lg-5 mt-5">
+                <h2 class="fw-bolder mb-4">Related books</h2>
+                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                    {% for book in related_books %}
+                    <div class="col mb-5">
+                        <div class="card h-100">
+                            <!-- Product image-->
+                            {% if book.cover %}
+                            <img class="card-img-top" width="200" height="290" src="{{ book.cover.url }}" alt="..." />
+                            {% else %}
+                            <img class="card-img-top" width="200" height="290" src="https://clipartix.com/wp-content/uploads/2016/08/Questions-magical-clipart-free-question-mark-clip-art-graphics-and-images.png" alt="..." />
+                            {% endif %}
+                            <!-- Product details-->
+                            <div class="card-body p-4">
+                                <div class="text-center">
+                                    <!-- Product name-->
+                                    <h5 class="fw-bolder">{{ book.title }}</h5>
+                                    <!-- Product price-->
+                                    {{ book.genres.all|join:", " }}
+                                </div>
+                            </div>
+                            <!-- Product actions-->
+                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{{ book.get_absolute_url }}">Read more</a></div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Book Reviews{% endblock %}
+
+{% block content %}
+<div class="container px-4 px-lg-5 mt-5">
+  <h2 class="reviews">Review for <a href="{% url 'book_detail' book.slug %}"> {{ book.title }} </a> </h2>
+  <strong>from {{ review.user }}</strong>
+            <div class=" h-100 my-4">
+            <!--<div class="comment-info container px-4 px-lg-5 mt-1">{{ review.created_date|date:"D, f" }}</div>-->
+            <div class="comment-info container px-4 px-lg-3 mt-1">
+            <!--<strong>from {{ review.user }}</strong>-->
+            </div>
+            <!--<hr style="width:100%;text-align:left;margin-left:0">-->
+            <div class="review container px-1 px-lg-3 mt-1">
+            <blockquote>{{ review.text }}</blockquote>
+            </div>
+            </div>
+{% if all %}
+<a href="#" class="btn btn-outline-success my-2 my-sm-0">{% if review.is_approved %}Unapprove review{% else %}Approve review{% endif %}</a>
+{% endif %}
+<a class="btn btn-outline-dark mt-auto mb-2" href="{% url 'book_reviews' book.slug %}">Back to all reviews</a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Update Book{% endblock %}
+
+{% block content %}
+<div style="width: 450px;  margin: 0 auto; padding: 10px;">
+<div class="justify-content-center align-items-center text-center">
+<h2>Edit book</h2>
+</div>
+<form method="post">
+  {% csrf_token %}
+  {{ form|crispy }}
+  <div class="justify-content-center align-items-center text-center">
+  <button class="btn btn-outline-success my-2 my-sm-2" type="submit">Save</button>
+  </div>
+</form>
+</div>
+{% endblock %}

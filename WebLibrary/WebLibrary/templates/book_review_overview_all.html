@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Book Reviews{% endblock %}
+
+{% block content %}
+<div class="container px-4 px-lg-5 mt-5">
+  <h2 class="reviews">Review for <a href="{% url 'book_detail' book.slug %}"> {{ book.title }} </a> </h2>
+  <strong>from {{ review.user }}</strong>
+  <strong style="color: #198754;">{% if review.is_approved %} Approved{% else %} Unapproved{% endif %}</strong>
+            <div class=" h-100 my-4">
+            <!--<div class="comment-info container px-4 px-lg-5 mt-1">{{ review.created_date|date:"D, f" }}</div>-->
+            <div class="comment-info container px-4 px-lg-3 mt-1">
+            <!--<strong>from {{ review.user }}</strong>-->
+            </div>
+            <!--<hr style="width:100%;text-align:left;margin-left:0">-->
+            <div class="review container px-1 px-lg-3 mt-1">
+            <blockquote>{{ review.text }}</blockquote>
+            </div>
+            </div>
+<div class="col-md-6">
+<a class="btn btn-outline-dark mt-auto mb-2" href="{% url 'all_book_reviews' book.slug %}">Back to all reviews</a>
+<form action="{% url 'book_review_update' book.slug review.review_id %}" method="post">
+{% csrf_token %}
+<input type="hidden" name="book_slug" value="{{ book.slug }}">
+<input type="hidden" name="review_id" value="{{ review.review_id }}">
+<button type="submit" class="btn btn-outline-success mb-2">{% if review.is_approved %}Unapprove review{% else %}Approve review{% endif %}</button>
+ </form>
+<!--    <a href="{% url 'book_review_update' book.slug review.review_id %}" class="btn btn-outline-success mb-2">{% if review.is_approved %}Unapprove review{% else %}Approve review{% endif %}</a>-->
+
+</div>
+</div>
+
+{% endblock %}

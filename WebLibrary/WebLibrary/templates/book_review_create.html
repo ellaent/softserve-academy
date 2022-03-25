@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Create Review{% endblock %}
+
+{% block content %}
+<div class="container px-4 px-lg-5 mt-5">
+<h3 class="fw-bolder mb-4 reviews">New Review For <a href="{% url 'book_detail' request.resolver_match.kwargs.book_slug %}"> {{ book.title }} </a> </h3>
+<form class="form-inline my-2 my-lg-0 mx-sm-3 align-items-center justify-content-center" method="post" action="">
+            {% csrf_token %}
+            <input type="hidden" name="book_slug" value="{{ request.resolver_match.kwargs.book_slug }}">
+            <input type="hidden" name="user_id" value="{{ user.id }}">
+            <input class="review form-control mr-sm-2" line-height="15" type="text" name="text">
+            <button class="btn btn-outline-success my-2 my-sm-2 mx-sm-3 align-items-center justify-content-center" type="submit" value="Save"name="comment_button">Send Review for approval</button>
+</form>
+</div>
+{% endblock %}

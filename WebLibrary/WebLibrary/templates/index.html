@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header class="bg-dark py-5">
+    <div class="container px-4 px-lg-1 my-1">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder">Books</h1>
+            <p class="lead fw-normal text-white-50 mb-0">With WebLibrary</p>
+        </div>
+    </div>
+</header>
+
+
+<section class="{% if request.session.edit_mode == 'edit' %} py-4 {% else %} py-5 {% endif %}">
+    {% if request.session.edit_mode == 'edit' %}
+    <div class="justify-content-center align-items-center text-center">
+    <a href="{% url 'book_add' %}" class="btn btn-outline-success my-2 my-sm-1 px-lg-5">+ Add Book</a>
+    <a href="{% url 'genre_add' %}" class="btn btn-outline-success my-2 my-sm-1 px-lg-5">+ Add Genre</a>
+    <a href="{% url 'author_add' %}" class="btn btn-outline-success my-2 my-sm-1 px-lg-5">+ Add Author</a>
+    </div>
+    {% endif %}
+    <div class="container px-4 px-lg-5 {% if request.session.edit_mode == 'edit' %} mt-4 {% else %} mt-5 {% endif %}">
+        {% if search %}
+        <h5 class="fw-bolder" class="blocktext">
+            Results found for '{{ search_name }}' ({{ search }})
+        </h5>
+        {% else %}
+        {% if search == 0 %}
+        <h5 class="fw-bolder" class="blocktext">
+            Unfortunately, no results found for '{{ search_name }}'
+        </h5>
+        {% endif %}
+        {% endif %}
+                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                    {% for book in page_obj %}
+                    <div class="col mb-5">
+                        <div class="card h-100">
+                            <!-- Product image-->
+                            {% if book.cover %}
+                            <img class="card-img-top" width="200" height="290" src="{{ book.cover.url }}" alt="..." />
+                            {% else %}
+                            <img class="card-img-top" width="200" height="290" src="https://clipartix.com/wp-content/uploads/2016/08/Questions-magical-clipart-free-question-mark-clip-art-graphics-and-images.png" alt="..." />
+                            {% endif %}
+                            <!-- Product details-->
+                            <div class="card-body p-4">
+                                <div class="text-center">
+                                    <!-- Product name-->
+                                    <h5 class="fw-bolder" class="blocktext">
+                                        {{ book.title }}
+                                    </h5>
+                                    <!-- Product price-->
+                                    {{ book.genres.all|join:", " }}
+                                </div>
+                            </div>
+                            <!-- Product actions-->
+                            <div class="card-footer p-4 pt-50 border-top bg-transparent">
+                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{{ book.get_absolute_url }}">Read more</a></div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+    </div>
+    <div class="text-center">
+        <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a class="btn btn-outline-dark mt-auto" href="?page=1">&laquo; first</a>
+            <a class="btn btn-outline-dark mt-auto" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+
+            <span class="btn btn-outline-dark mt-auto" class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+            {% if page_obj.has_next %}
+                <a class="btn btn-outline-dark mt-auto" href="?page={{ page_obj.next_page_number }}">Next</a>
+                <a class="btn btn-outline-dark mt-auto" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+</section>
+
+
+{% endblock %}
