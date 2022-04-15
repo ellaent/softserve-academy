@@ -1,0 +1,95 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/jquery.simplePagination.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/simplePagination.min.css">
+	<link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+	<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='interview_score.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="box box--list head center">
+	<header class="box--list__header">
+		<h1 class="box--list__header-title">Interview for <strong>{{ interview.assignee }}</strong></h1>
+	</header>
+	<div class="box--list__items live-search-s" >
+			<h2 class="box--list__title">Position: {{ interview.position }}</h2>
+			<span class="tag tag-primary" id="score">Score: {{ interview.score }} / {{ interview.max_score }}</span>
+	</div>
+        <div class="box--list__items live-search-q" >
+		{% for question in questions %}
+		<div class="box--list__item" id="{{ question.id }}" draggable="true" ondragstart="drag(event)">
+			<h2 class="box--list__title">{{ question.essence }}</h2>
+			<p class="box--grid__description">{{ question.answer }}</p>
+		</div>
+        <div class="containerLeft">
+           <div class="card-two">
+
+             <div class="rates">
+                {% for mark in range(1,question.mark|int + 1) %}
+               <div class="dot {{ 'dot_' + question.id|string() }} {% if scores[question.id|string] %}{% if mark|int == scores[question.id|string]|int %}active{% endif %}{% endif %}" id="{{ 'dot_' + question.id|string() + '_' + mark|string() }}">{{ mark }}</div>
+               {% endfor %}
+
+             </div>
+           </div>
+        </div>
+		{% endfor %}
+	    </div>
+</div>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $(".dot").click(function () {
+        $(this).addClass("active");
+        var activeid = this.id;
+        var txt = $(this).text();
+        console.log(activeid);
+        var active_split = activeid.split('_')
+        var active_class = active_split[0] + '_' + active_split[1]
+        $('.dot.' + active_class).each(function(){
+              if (this.id != activeid) {
+              	  console.log($(this).attr("class"));
+                  $(this).removeClass("active");
+              }
+		});
+		var interview_id = {{ interview.id }}
+		$.ajax({
+          url: "/interview/score/data",
+          method:"POST",
+          data:{"mark": txt, "dotid": activeid, "interview_id": interview_id},
+          success: function(response) {
+          	$('#score').html(response);
+            console.log(response);
+           },
+          error: function(xhr) {
+            console.log(xhr);
+              //Handle error
+          }
+        });
+      });
+    });
+	const accordionBtns = document.querySelectorAll(".item-header");
+
+		accordionBtns.forEach((accordion) => {
+		  accordion.onclick = function () {
+			this.classList.toggle("active");
+
+			let content = this.nextElementSibling;
+			console.log(content);
+
+			if (content.style.maxHeight) {
+			  //this is if the accordion is open
+			  content.style.maxHeight = null;
+			} else {
+			  //if the accordion is currently closed
+			  content.style.maxHeight = content.scrollHeight + "px";
+			  console.log(content.style.maxHeight);
+			}
+		  };
+		});
+
+	</script>
+</div>
+</td>
+</table>
+{% endblock %}

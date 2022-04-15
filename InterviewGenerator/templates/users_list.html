@@ -1,0 +1,103 @@
+{% extends 'layout.html' %}
+{% block head %}
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/jquery.simplePagination.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/simplePagination.min.css">
+	<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='questions.css') }}">
+{% endblock %}
+{% block body %}
+<div class="og-contianer live-search-s">
+  <h1 class="heading-line">Users</h1>
+  <a href="/add_user" class="btn btn-primary a-btn-slide-text">
+       <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+        <span><strong>+ Add User</strong></span>
+    </a>
+  <input type="text" class="live-search-box-s" placeholder="search here" />
+  <div class="og-row og-li og-li-head">
+    <div class="og-li-col og-li-col-1 text-center">#</div>
+    <div class="og-li-col og-li-col-2">Name</div>
+    <div class="og-li-col og-li-col-3 text-center">Email</div>
+    <div class="og-li-col og-li-col-4 text-center">Active</div>
+    <div class="og-li-col og-li-col-5 text-center">Role</div>
+  </div>
+  {% for user in users %}
+  <div class="set data-row og-row og-li Experienced Engineering 7.3 ready_to_hire Andhra Pradesh Yes">
+    <div class="og-li-col og-li-col-1 text-center">{{ user.id }}</div>
+    <div class="og-li-col og-li-col-2 text-center">{{ user.name }} {{ user.surname }}</div>
+    <div class="og-li-col og-li-col-3 text-center">{{ user.email }}</div>
+    <div class="og-li-col og-li-col-4 text-center">{% if user.is_active %} &#9989 {% else %} &#10060 {% endif %}</div>
+    <div class="og-li-col og-li-col-5 text-center">{% if user.is_recruiter %} Recruiter {% else %} Tech Expert {% endif %}</div>
+    <div class="og-li-col og-li-col-6 text-center">
+    </div>
+  </div>
+  {% endfor %}
+  <div id="pagination-s" data-percent="{{ users|length }}"></div>
+</div>
+<script>
+    jQuery(document).ready(function($){
+	$('.live-search-s .set').each(function(){
+	$(this).attr('data-search-term', $(this).text().toLowerCase());
+	});
+
+	$('.live-search-box-s').on('keyup', function(){
+
+	var searchTerm = $(this).val().toLowerCase();
+	var state = [];
+    if ($(this).val() != '') {
+
+		$('.live-search-s .set').each(function(){
+              if ($(this).filter('[data-search-term *= ' + searchTerm + ']').length > 0 || searchTerm.length < 1) {
+                  $(this).show();
+                  $(this).addClass("search");
+              } else {
+                  $(this).hide();
+                  $(this).removeClass("search");
+              }
+		});
+		console.log(state);
+		$(".live-search-s .set.search").slice(4).hide();
+        $('#pagination-s').pagination({
+            items: $(".live-search-s .set.search").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $('.live-search-s .set.search').hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+
+    } else {
+        $('.live-search-s .set').each(function(){
+              $(this).show();
+		});
+        $(".live-search-s .set").slice(4).hide();
+        $('#pagination-s').show()
+        $('#pagination-s').pagination({
+
+            items: $(".live-search-s .set").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $(".live-search-s .set").hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+    }
+	});
+
+	$(".live-search-s .set").slice(4).hide();
+        $('#pagination-s').pagination({
+
+            items: $(".live-search-s .set").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $(".live-search-s .set").hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+	});
+
+</script>
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='questions.css') }}">
+{% endblock %}

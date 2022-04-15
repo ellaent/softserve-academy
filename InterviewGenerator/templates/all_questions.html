@@ -1,0 +1,190 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/jquery.simplePagination.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/simplePagination.min.css">
+	<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='disp.css') }}">
+{% endblock %}
+
+{% block body %}
+<table class="center">
+<td style="vertical-align:top;">
+<div class="box box--list" style="position : fixed; left: 50%">
+	<header class="box--list__header">
+		<h1 class="box--list__header-title">Sets</h1>
+		<a href="{{ url_for('helper.show_sets_full') }}" class="box--list__header-link">
+			View all
+			<svg xmlns="http://www.w3.org/2000/svg" width="10.444" height="9.7"><defs><clipPath id="a"><path fill="none" d="M0 0h10.444v9.7H0z"/></clipPath></defs><g fill="none" stroke="#2a46cc" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.438" clip-path="url(#a)"><path d="M.719 4.85h8.709M5.594 8.683L9.427 4.85M5.594 1.017L9.427 4.85"/></g></svg>
+		</a>
+	</header>
+
+	<input type="text" class="live-search-box-s" placeholder="search here" />
+	<div class="box--list__items live-search-s" >
+		{% for set in sets %}
+		<div class="box--list__item" id="{{ set.id }}" draggable="true" ondragstart="drag(event)">
+			<h2 class="box--list__title">{{ set.name }}</h2>
+			<span class="tag tag-primary">{{ set.level }}</span>
+		</div>
+		{% endfor %}
+	</div>
+	<div id="pagination-s" data-percent="{{ sets|length }}"></div>
+</div>
+
+</td>
+<td style="vertical-align:top;">
+
+<div class="box box--list right">
+	<header class="box--list__header">
+		<h1 class="box--list__header-title">Questions</h1>
+		<a href="{{ url_for('helper.show_questions_full') }}" class="box--list__header-link">
+			View all
+			<svg xmlns="http://www.w3.org/2000/svg" width="10.444" height="9.7"><defs><clipPath id="a"><path fill="none" d="M0 0h10.444v9.7H0z"/></clipPath></defs><g fill="none" stroke="#2a46cc" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.438" clip-path="url(#a)"><path d="M.719 4.85h8.709M5.594 8.683L9.427 4.85M5.594 1.017L9.427 4.85"/></g></svg>
+		</a>
+	</header>
+
+	<input type="text" class="live-search-box-q" placeholder="search here" />
+	<div class="box--list__items live-search-q" >
+		{% for question in questions %}
+		<div class="box--list__item" id="{{ question.id }}" draggable="true" ondragstart="drag(event)">
+			<h2 class="box--list__title">{{ question.essence }}</h2>
+			<span class="tag tag-primary">{{ question.theme }}</span>
+		</div>
+		{% endfor %}
+	</div>
+	<div id="pagination-q" data-percent="{{ questions|length }}"></div>
+  <script type="text/javascript">
+	jQuery(document).ready(function($){
+
+	$('.live-search-q .box--list__item').each(function(){
+	$(this).attr('data-search-term', $(this).text().toLowerCase());
+	});
+
+	$('.live-search-box-q').on('keyup', function(){
+
+	var searchTerm = $(this).val().toLowerCase();
+	var state = [];
+    if ($(this).val() != '') {
+
+		$('.live-search-q .box--list__item').each(function(){
+              if ($(this).filter('[data-search-term *= ' + searchTerm + ']').length > 0 || searchTerm.length < 1) {
+                  $(this).show();
+                  $(this).addClass("search");
+              } else {
+                  $(this).hide();
+                  $(this).removeClass("search");
+              }
+		});
+		console.log(state);
+		$(".live-search-q .box--list__item.search").slice(4).hide();
+        $('#pagination-q').pagination({
+            items: $(".live-search-q .box--list__item.search").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $('.live-search-q .box--list__item.search').hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+
+    } else {
+        $('.live-search-q .box--list__item').each(function(){
+              $(this).show();
+		});
+        $(".live-search-q .box--list__item").slice(4).hide();
+        $('#pagination-q').show()
+        $('#pagination-q').pagination({
+
+            items: $(".live-search-q .box--list__item").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $(".live-search-q .box--list__item").hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+    }
+	});
+
+	$(".live-search-q .box--list__item").slice(4).hide();
+        $('#pagination-q').pagination({
+
+            items: $(".live-search-q .box--list__item").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $(".live-search-q .box--list__item").hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+
+
+	$('.live-search-s .box--list__item').each(function(){
+	$(this).attr('data-search-term', $(this).text().toLowerCase());
+	});
+
+	$('.live-search-box-s').on('keyup', function(){
+
+	var searchTerm = $(this).val().toLowerCase();
+	var state = [];
+    if ($(this).val() != '') {
+
+		$('.live-search-s .box--list__item').each(function(){
+              if ($(this).filter('[data-search-term *= ' + searchTerm + ']').length > 0 || searchTerm.length < 1) {
+                  $(this).show();
+                  $(this).addClass("search");
+              } else {
+                  $(this).hide();
+                  $(this).removeClass("search");
+              }
+		});
+		console.log(state);
+		$(".live-search-s .box--list__item.search").slice(3).hide();
+        $('#pagination-s').pagination({
+            items: $(".live-search-s .box--list__item.search").length,
+            itemsOnPage: 3,
+            onPageClick: function (noofele) {
+                $('.live-search-s .box--list__item.search').hide()
+                    .slice(3*(noofele-1),
+                    3+ 3* (noofele - 1)).show();
+            }
+        });
+
+    } else {
+        $('.live-search-s .box--list__item').each(function(){
+              $(this).show();
+		});
+        $(".live-search-s .box--list__item").slice(3).hide();
+        $('#pagination-s').show()
+        $('#pagination-s').pagination({
+
+            items: $(".live-search-s .box--list__item").length,
+            itemsOnPage: 3,
+            onPageClick: function (noofele) {
+                $(".live-search-s .box--list__item").hide()
+                    .slice(3*(noofele-1),
+                    3+ 3* (noofele - 1)).show();
+            }
+        });
+    }
+	});
+
+	$(".live-search-s .box--list__item").slice(3).hide();
+        $('#pagination-s').pagination({
+
+            items: $(".live-search-s .box--list__item").length,
+            itemsOnPage: 3,
+            onPageClick: function (noofele) {
+                $(".live-search-s .box--list__item").hide()
+                    .slice(3*(noofele-1),
+                    3+ 3* (noofele - 1)).show();
+            }
+        });
+
+	});
+	</script>
+</div>
+</td>
+</table>
+
+{% endblock %}

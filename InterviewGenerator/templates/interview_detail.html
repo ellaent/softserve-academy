@@ -1,0 +1,245 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+<!--  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='questions.css') }}">-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/jquery.simplePagination.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/simplePagination.min.css">
+	<link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+	<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='interview_detail.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="box box--list head center">
+	<header class="box--list__header">
+		<h1 class="box--list__header-title">Interview for <strong>{{ interview.assignee }}</strong></h1>
+		{% if current_user in interview.experts %}
+		{% if ((interview.sets|length > 0) or (interview.questions|length > 0)) and (interview.is_conducted == False) %}
+		<a href="/interviews/score/{{ interview.id }}" class="box--list__header-link">
+			Evaluate
+			<svg xmlns="http://www.w3.org/2000/svg" width="10.444" height="9.7"><defs><clipPath id="a"><path fill="none" d="M0 0h10.444v9.7H0z"/></clipPath></defs><g fill="none" stroke="#2a46cc" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.438" clip-path="url(#a)"><path d="M.719 4.85h8.709M5.594 8.683L9.427 4.85M5.594 1.017L9.427 4.85"/></g></svg>
+		</a>
+		{% endif %}
+		{% endif %}
+	</header>
+	<div class="box--list__items live-search-s" >
+			<h2 class="box--list__title">Position: {{ interview.position }}</h2>
+			<p style="margin-bottom: 10px;">Experts: {% for expert in interview.experts %} {{ expert }}, {% endfor %}</p>
+			{% if interview.max_score %}
+			<span class="tag tag-primary">Score: {{ interview.score }} / {{ interview.max_score }}</span>
+			{% else %}
+			<span class="tag tag-primary">Not scored</span>
+			{% endif %}
+	</div>
+</div>
+<table class="center">
+<td style="vertical-align:top;" class="center">
+<div class="box box--list center">
+	<header class="box--list__header">
+		<h1 class="box--list__header-title">Sets</h1>
+	</header>
+
+	<input type="text" class="live-search-box-s" placeholder="search here" />
+	<div class="box--list__items live-search-s" >
+		{% for set in interview.sets %}
+		<div class="accordion-content">
+              <div class="accordion-item">
+                <header class="item-header">
+                  <h4 class="item-question">
+                      {{ set.name }}
+                  </h4>
+                  <div class="item-icon">
+                    <i class='bx bx-chevron-down'></i>
+                  </div>
+                </header>
+
+                <div class="item-content">
+				  {% for question in set.questions %}
+                  <p class="item-answer">
+                    {{ question.essence }}
+                  </p>
+				  {% endfor %}
+                </div>
+              </div>
+
+		</div>
+		{% endfor %}
+	</div>
+	<div id="pagination-s" data-percent="{{ interview.sets|length }}"></div>
+</div>
+
+</td>
+<td style="vertical-align:top;" class="center">
+
+<div class="box box--list right center">
+	<header class="box--list__header">
+		<h1 class="box--list__header-title">Additional Questions</h1>
+	</header>
+
+	<input type="text" class="live-search-box-q" placeholder="search here" />
+	<div class="box--list__items live-search-q" >
+		{% for question in interview.questions %}
+		<div class="box--list__item" id="{{ question.id }}" draggable="true" ondragstart="drag(event)">
+			<h2 class="box--list__title">{{ question.essence }}</h2>
+<!--			<p class="box&#45;&#45;grid__description">{{ question.answer }}</p>-->
+			<span class="tag tag-primary">{{ question.theme }}</span>
+		</div>
+		{% endfor %}
+	</div>
+	<div id="pagination-q" data-percent="{{ interview.questions|length }}"></div>
+  <script type="text/javascript">
+	jQuery(document).ready(function($){
+
+	$('.live-search-q .box--list__item').each(function(){
+	$(this).attr('data-search-term', $(this).text().toLowerCase());
+	});
+
+	$('.live-search-box-q').on('keyup', function(){
+
+	var searchTerm = $(this).val().toLowerCase();
+    if ($(this).val() != '') {
+
+		$('.live-search-q .box--list__item').each(function(){
+              if ($(this).filter('[data-search-term *= ' + searchTerm + ']').length > 0 || searchTerm.length < 1) {
+                  $(this).show();
+                  $(this).addClass("search");
+              } else {
+                  $(this).hide();
+                  $(this).removeClass("search");
+              }
+		});
+		$(".live-search-q .box--list__item.search").slice(4).hide();
+        $('#pagination-q').pagination({
+            items: $(".live-search-q .box--list__item.search").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $('.live-search-q .box--list__item.search').hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+
+    } else {
+        $('.live-search-q .box--list__item').each(function(){
+              $(this).show();
+		});
+        $(".live-search-q .box--list__item").slice(4).hide();
+        $('#pagination-q').show()
+        $('#pagination-q').pagination({
+
+            items: $(".live-search-q .box--list__item").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $(".live-search-q .box--list__item").hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+    }
+	});
+
+	$(".live-search-q .box--list__item").slice(4).hide();
+        $('#pagination-q').pagination({
+
+            items: $(".live-search-q .box--list__item").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $(".live-search-q .box--list__item").hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+
+
+	$('.live-search-s .accordion-content').each(function(){
+	$(this).attr('data-search-term', $(this).text().toLowerCase());
+	});
+
+	$('.live-search-box-s').on('keyup', function(){
+
+	var searchTerm = $(this).val().toLowerCase();
+	var state = [];
+    if ($(this).val() != '') {
+
+		$('.live-search-s .accordion-content').each(function(){
+              if ($(this).filter('[data-search-term *= ' + searchTerm + ']').length > 0 || searchTerm.length < 1) {
+                  $(this).show();
+                  $(this).addClass("search");
+              } else {
+                  $(this).hide();
+                  $(this).removeClass("search");
+              }
+		});
+		console.log(state);
+		$(".live-search-s .accordion-content.search").slice(4).hide();
+        $('#pagination-s').pagination({
+            items: $(".live-search-s .accordion-content.search").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $('.live-search-s .accordion-content.search').hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+
+    } else {
+        $('.live-search-s .accordion-content').each(function(){
+              $(this).show();
+		});
+        $(".live-search-s .accordion-content").slice(4).hide();
+        $('#pagination-s').show()
+        $('#pagination-s').pagination({
+
+            items: $(".live-search-s .accordion-content").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $(".live-search-s .accordion-content").hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+    }
+	});
+
+	$(".live-search-s .accordion-content").slice(4).hide();
+        $('#pagination-s').pagination({
+
+            items: $(".live-search-s .accordion-content").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $(".live-search-s .accordion-content").hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+
+	});
+
+
+
+	const accordionBtns = document.querySelectorAll(".item-header");
+
+		accordionBtns.forEach((accordion) => {
+		  accordion.onclick = function () {
+			this.classList.toggle("active");
+
+			let content = this.nextElementSibling;
+			console.log(content);
+
+			if (content.style.maxHeight) {
+			  //this is if the accordion is open
+			  content.style.maxHeight = null;
+			} else {
+			  //if the accordion is currently closed
+			  content.style.maxHeight = content.scrollHeight + "px";
+			  console.log(content.style.maxHeight);
+			}
+		  };
+		});
+
+	</script>
+</div>
+</td>
+</table>
+<a href="/interviews" style = "color: black;"> << Back </a>
+{% endblock %}

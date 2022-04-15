@@ -1,0 +1,113 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/jquery.simplePagination.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/simplePagination.min.css">
+    <link rel="stylesheet" href="/static/grid.css">
+{% endblock %}
+
+{% block body %}
+  <input type="text" class="live-search-box" placeholder="search here" />
+  <div class="albums live-search-interviews">
+    {% for interview in interviews %}
+    <div class="album">
+      <div>
+          {% if interview.max_score %}
+          <div class="btn btn-primary"> Score: {{ interview.score }} / {{ interview.max_score }} </div>
+          {% else %}
+          <div class="btn btn-primary"> Not Scored </div>
+          {% endif %}
+          <div class="btn btn-primary"> Status: {% if interview.is_conducted %} Closed {% else %} Opened {% endif %}</div>
+          {% if ((interview.sets|length > 0) or (interview.questions|length > 0)) and (interview.is_conducted == False) %}
+          <a href="/interviews/score/{{ interview.id }}" class="btn btn-primary a-btn-slide-text edit" >
+            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+            <span><strong>Evaluate</strong></span>
+          </a>
+          {% endif %}
+          <a href="/interviews/{{ interview.id }}/add_questions" class="btn btn-primary a-btn-slide-text edit" >
+            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+            <span><strong>Add Questions</strong></span>
+          </a>
+      </div>
+      <div class="album__details">
+        <h2>{{ interview.assignee }}</h2>
+        <p class="album__artist">{{ interview.position }}</p>
+        <a href="/interviews/{{ interview.id }}" class="btn btn-primary a-btn-slide-text edit" style="padding: 0.15rem 0.75rem;">
+        <span class="glyphicon glyphicon-edit" hidden="true">{{ interview.experts }}</span>
+        <span><strong>Detail View</strong></span>
+          </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div id="pagination" data-percent="{{ interviews|length }}"></div>
+  <script type="text/javascript">
+		jQuery(document).ready(function($){
+
+	$('.live-search-interviews .album').each(function(){
+	$(this).attr('data-search-term', $(this).text().toLowerCase());
+	});
+
+	$('.live-search-box').on('keyup', function(){
+
+	var searchTerm = $(this).val().toLowerCase();
+    if ($(this).val() != '') {
+
+		$('.live-search-interviews .album').each(function(){
+              if ($(this).filter('[data-search-term *= ' + searchTerm + ']').length > 0 || searchTerm.length < 1) {
+                  $(this).show();
+                  $(this).addClass("search");
+              } else {
+                  $(this).hide();
+                  $(this).removeClass("search");
+              }
+		});
+		$(".live-search-interviews .album.search").slice(6).hide();
+        $('#pagination').pagination({
+
+
+            items: $(".live-search-interviews .album.search").length,
+            itemsOnPage: 6,
+            onPageClick: function (noofele) {
+                $('.live-search-interviews .album.search').hide()
+                    .slice(6*(noofele-1),
+                    6+ 6* (noofele - 1)).show();
+            }
+        });
+
+    } else {
+        $('.live-search-interviews .album').each(function(){
+              $(this).show();
+		});
+        $(".live-search-interviews .album").slice(6).hide();
+        $('#pagination').show()
+        $('#pagination').pagination({
+
+            items: $(".live-search-interviews .album").length,
+            itemsOnPage: 6,
+            onPageClick: function (noofele) {
+                $(".live-search-interviews .album").hide()
+                    .slice(6*(noofele-1),
+                    6+ 6* (noofele - 1)).show();
+            }
+        });
+    }
+	});
+
+	$(".live-search-interviews .album").slice(6).hide();
+        $('#pagination').pagination({
+
+            items: $(".live-search-interviews .album").length,
+            itemsOnPage: 6,
+            onPageClick: function (noofele) {
+                $(".live-search-interviews .album").hide()
+                    .slice(6*(noofele-1),
+                    6+ 6* (noofele - 1)).show();
+            }
+        });
+
+	});
+	</script>
+
+{% endblock %}

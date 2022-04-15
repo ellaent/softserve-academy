@@ -1,0 +1,57 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+	<link rel="stylesheet" href="/static/dashboard.css">
+{% endblock %}
+
+{% block body %}
+
+   <h1 align="center">Welcome {{session.name}}</h1>
+  <div class="row mysec" id="teacher-section">
+	    {% if current_user.is_admin or current_user.is_recruiter %}
+		<div class="col-3 box">
+			<div class="card shadow">
+				<div class="card-body">
+					<img src="static/notepad.png" alt="" width="100px">
+					<center><a href='/create_interview' class="btn btn-primary mybtn">Create Interview</a></center>
+				</div>
+			</div>
+	   </div>
+	   {% else %}
+	   <div class="col-3 box">
+			<div class="card shadow">
+				<div class="card-body">
+					<img src="static/notepad.png" alt="" width="100px">
+					<center><a href='/create_question_set' class="btn btn-primary mybtn">Create Set</a></center>
+				</div>
+			</div>
+	   </div>
+	   {% endif %}
+	  	<div class="col-3 box">
+			<div class="card shadow">
+				<div class="card-body">
+					<img src="static/laptop.png" alt="" width="100px">
+					<center><a href="/interviews" class="btn btn-primary mybtn">Interviews</a></center>
+				</div>
+			</div>
+	  	</div>
+	  	<div class="col-3 box">
+			<div class="card shadow">
+				<div class="card-body">
+					<img src="static/result.png" alt="" width="100px">
+					<center><a href="/questions/all" class="btn btn-primary mybtn">Questions</a></center>
+				</div>
+			</div>
+		</div>
+		<div class="col-3 box">
+			<div class="card shadow">
+				<div class="card-body">
+					<img src="static/research.png" alt="" width="100px">
+					<center><a href="results" class="btn btn-primary mybtn">Results</a></center>
+				</div>
+			</div>
+		</div>
+ </div>
+
+{% endblock %}
+

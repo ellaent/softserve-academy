@@ -1,0 +1,124 @@
+{% extends 'layout.html' %}
+{% block head %}
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/jquery.simplePagination.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/simplePagination.min.css">
+	<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='questions.css') }}">
+{% endblock %}
+{% block body %}
+<div class="og-contianer live-search-s">
+  <h1 class="heading-line">All Results</h1>
+  <input type="text" class="live-search-box-s" placeholder="search here" />
+  <div class="og-row og-li og-li-head">
+    <div class="og-li-col og-li-col-1 text-center">#</div>
+    <div class="og-li-col og-li-col-2">Assignee</div>
+    <div class="og-li-col og-li-col-3 text-center">Experts</div>
+    <div class="og-li-col og-li-col-4 text-center">Position</div>
+    <div class="og-li-col og-li-col-5 text-center">Score</div>
+  </div>
+  {% for interview in interviews %}
+  <div class="set data-row og-row og-li Experienced Engineering 7.3 ready_to_hire Andhra Pradesh Yes">
+    <div class="og-li-col og-li-col-1 text-center">{{ interview.id }}</div>
+    <div class="og-li-col og-li-col-2">{{ interview.assignee }}</div>
+    <div class="og-li-col og-li-col-3 text-center">
+      {% for exp in interview.experts %}
+      {{exp}}{% if loop.index != interview.experts|length %},{% endif %}
+      {% endfor %}
+    </div>
+    <div class="og-li-col og-li-col-4 text-center">{{ interview.position }}</div>
+    <div class="og-li-col og-li-col-5 text-center">{% if interview.max_score %}{{ interview.score }} / {{ interview.max_score }}{% else %}Not Scored{% endif %}</div>
+  </div>
+    <script>
+        function Some(data){
+            const accordionBtns = document.querySelectorAll(".item-header." + data);
+
+
+        accordionBtns.forEach((accordion) => {
+          accordion.onclick = function () {
+            this.classList.toggle("active");
+
+            let content = this.nextElementSibling;
+            console.log(content);
+
+            if (content.style.maxHeight) {
+              //this is if the accordion is open
+              content.style.maxHeight = null;
+            } else {
+              //if the accordion is currently closed
+              content.style.maxHeight = content.scrollHeight + "px";
+              console.log(content.style.maxHeight);
+            }
+          };
+        });
+        }
+    </script>
+  {% endfor %}
+  <div id="pagination-s" data-percent="{{ interviews|length }}"></div>
+  <a href="/dashboard" style = "color: black;"> Back << </a>
+</div>
+<script>
+    jQuery(document).ready(function($){
+	$('.live-search-s .set').each(function(){
+	$(this).attr('data-search-term', $(this).text().toLowerCase());
+	});
+
+	$('.live-search-box-s').on('keyup', function(){
+
+	var searchTerm = $(this).val().toLowerCase();
+    if ($(this).val() != '') {
+
+		$('.live-search-s .set').each(function(){
+              if ($(this).filter('[data-search-term *= ' + searchTerm + ']').length > 0 || searchTerm.length < 1) {
+                  $(this).show();
+                  $(this).addClass("search");
+              } else {
+                  $(this).hide();
+                  $(this).removeClass("search");
+              }
+		});
+		$(".live-search-s .set.search").slice(4).hide();
+        $('#pagination-s').pagination({
+            items: $(".live-search-s .set.search").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $('.live-search-s .set.search').hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+
+    } else {
+        $('.live-search-s .set').each(function(){
+              $(this).show();
+		});
+        $(".live-search-s .set").slice(4).hide();
+        $('#pagination-s').show()
+        $('#pagination-s').pagination({
+
+            items: $(".live-search-s .set").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $(".live-search-s .set").hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+    }
+	});
+
+	$(".live-search-s .set").slice(4).hide();
+        $('#pagination-s').pagination({
+
+            items: $(".live-search-s .set").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $(".live-search-s .set").hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+	});
+
+</script>
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='questions.css') }}">
+{% endblock %}

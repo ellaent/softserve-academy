@@ -1,0 +1,151 @@
+{% extends 'layout.html' %}
+{% block head %}
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/jquery.simplePagination.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/simplePagination.min.css">
+	<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='questions.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="og-contianer live-search-q">
+  <h1 class="heading-line">Questions</h1>
+  <a href="/create_question" class="btn btn-primary a-btn-slide-text">
+       <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+        <span><strong>+ Add Question</strong></span>
+    </a>
+  <div class="og-row" id="og-filters">
+    <form id="multiple_select_form">
+    <select class="" name="theme" onchange="this.form.submit">
+      <option value="" selected="">Theme</option>
+      {% for theme in themes %}
+        <option value="{{ theme }}" type="submit" {% if selected_theme == theme %}selected=""{% endif %}>{{ theme }}</option>
+      {% endfor %}
+    </select>
+    <select class="" name="mark" id="experience" placeholder="Max Mark" onchange="this.form.submit">
+      <option value="" selected="">Max Mark</option>
+      {% for mark in range(1,11) %}
+      <option value="{{ mark }}" type="submit" {% if selected_mark|string() == mark|string() %}selected=""{% endif %}>Max Mark: {{ mark }}</option>
+      {% endfor %}
+    </select>
+    </form>
+    <button class="btn btn-primary a-btn-slide-text">
+          <a href="/questions/all/full"> Reset filters </a>
+    </button>
+  </div>
+  <input type="text" class="live-search-box-q" placeholder="search here" />
+  <div class="og-row og-li og-li-head">
+    <div class="og-li-col og-li-col-1 text-center">#</div>
+    <div class="og-li-col og-li-col-2">Essence</div>
+    <div class="og-li-col og-li-col-3 text-center">Expected Answer</div>
+    <div class="og-li-col og-li-col-4 text-center">Theme</div>
+    <div class="og-li-col og-li-col-5 text-center">Max Mark</div>
+  </div>
+  {% for question in questions %}
+  <div class="question data-row og-row og-li Experienced Engineering 7.3 ready_to_hire Andhra Pradesh Yes">
+    <div class="og-li-col og-li-col-1 text-center">{{ question.id }}</div>
+    <div class="og-li-col og-li-col-2">{{ question.essence }}</div>
+    <div class="og-li-col og-li-col-3">{{ question.answer }}</div>
+    <div class="og-li-col og-li-col-4 text-center">{{ question.theme }}</div>
+    <div class="og-li-col og-li-col-5 text-center">{{ question.mark }}</div>
+    <div class="og-li-col og-li-col-6 text-center">
+    {% if current_user.is_expert or current_user.is_admin%}
+    <a href="/questions/all/{{ question.id }}/update" class="btn btn-primary a-btn-slide-text edit" >
+        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+        <span><strong>      Edit      </strong></span>
+    </a>
+    <a href="/questions/all/{{ question.id }}/delete" class="btn btn-primary a-btn-slide-text edit">
+       <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+        <span><strong>Delete</strong></span>
+    </a>
+    {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+  <div id="pagination-q" data-percent="{{ questions|length }}"></div>
+  <a href="/questions/all" style = "color: black;"> << Back </a>
+  <script type="text/javascript" async>
+	jQuery(document).ready(function($){
+
+	$('.live-search-q .question').each(function(){
+	$(this).attr('data-search-term', $(this).text().toLowerCase());
+	});
+
+	$('.live-search-box-q').on('keyup', function(){
+
+	var searchTerm = $(this).val().toLowerCase();
+	var state = [];
+    if ($(this).val() != '') {
+
+		$('.live-search-q .question').each(function(){
+              if ($(this).filter('[data-search-term *= ' + searchTerm + ']').length > 0 || searchTerm.length < 1) {
+                  $(this).show();
+                  $(this).addClass("search");
+              } else {
+                  $(this).hide();
+                  $(this).removeClass("search");
+              }
+		});
+		console.log(state);
+		$(".live-search-q .question.search").slice(4).hide();
+        $('#pagination-q').pagination({
+            items: $(".live-search-q .question.search").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $('.live-search-q .question.search').hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+
+    } else {
+        $('.live-search-q .question').each(function(){
+              $(this).show();
+		});
+        $(".live-search-q .question").slice(4).hide();
+        $('#pagination-q').show()
+        $('#pagination-q').pagination({
+
+            items: $(".live-search-q .question").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $(".live-search-q .question").hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+    }
+	});
+
+	$(".live-search-q .question").slice(4).hide();
+        $('#pagination-q').pagination({
+
+            items: $(".live-search-q .question").length,
+            itemsOnPage: 4,
+            onPageClick: function (noofele) {
+                $(".live-search-q .question").hide()
+                    .slice(4*(noofele-1),
+                    4+ 4* (noofele - 1)).show();
+            }
+        });
+	});
+
+
+
+    $(document).ready(function(){
+    $('#multiple_select_form').on('change', function(event){
+        event.preventDefault();
+            var form_data = $(this).serialize();
+            $.ajax({
+                url:"{{ url_for( 'helper.show_questions_full' ) }}",
+                method:"POST",
+                data:form_data,
+                success:function(data)
+                {
+                window.location.href = data.redirect;
+                }
+            })
+    });
+    });
+	</script>
+</div>
+{% endblock %}

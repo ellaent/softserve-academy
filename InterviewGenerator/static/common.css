@@ -1,0 +1,26 @@
+.btn-primary {
+	background-color: rgb(169, 99, 221, 0.7);
+	border-color: rgb(169, 99, 221, 0.7);
+	margin: 2px;
+}
+
+.btn-primary:hover {
+    background-color: rgb(169, 99, 221, 0.7);
+    border-color: rgb(169, 99, 221, 0.7);
+}
+
+a.btn-primary {
+    background-color: #6a63dd !important;
+}
+
+a:hover {
+    transform: scale(1.1) perspective(1px);
+}
+
+h1 {
+    color: #616161;
+}
+
+body {
+	font-family: 'Roboto Condensed', sans-serif;
+}

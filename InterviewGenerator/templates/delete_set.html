@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+{% block head %}
+  <link rel="stylesheet" href="/static/common.css">
+  <link rel="stylesheet" href="/static/create_interview.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
+{% endblock %}
+{% block body %}
+<div class="login-box well">
+<form action='' method="post">
+    Click YES to confirm
+    <input type = "submit" value="YES">
+    <a href="{{ url_for('helper.show_sets_full') }}">Cancel</a>
+</form>
+</div>
+{% endblock %}

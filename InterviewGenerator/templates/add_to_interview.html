@@ -1,0 +1,78 @@
+{% extends 'layout.html' %}
+{% block head %}
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
+  <link rel="stylesheet" href="/static/common.css">
+  <link rel="stylesheet" href="/static/create_interview.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
+{% endblock %}
+{% block body %}
+{% from "includes/_formhelpers.html" import render_field %}
+<div id="heading">
+  <div class="col">
+    <h1>Add Questions</h1>
+  </div>
+</div>
+<div class="login-box well">
+  <form method="POST" enctype="multipart/form-data" id="multiple_select_form">
+    Sets
+    <div class="form-group">
+    <select name="sets" id="sets" class="form-control selectpicker-s" data-live-search="true" multiple>
+      {% for set in sets %}
+      <option value="{{set.id}}">{{set}}</option>
+      {% endfor %}
+    </select>
+    </div>
+    <br /><br />
+    <div class="form-group">
+    <input type="hidden" name="hidden_sets" id="hidden_sets" />
+      <div class="form-group">
+    Questions
+    <select name="questions" id="questions" class="form-control selectpicker-q" data-live-search="true" multiple>
+      {% for question in questions %}
+      <option value="{{question.id}}">{{question}}</option>
+      {% endfor %}
+    </select>
+    </div>
+    <br /><br />
+    <input type="hidden" name="hidden_questions" id="hidden_questions" />
+    <p><input type="submit" name="submit" class="btn btn-primary" value="Submit" /></p>
+  </form>
+</div>
+<script>
+$(document).ready(function(){
+    $('.selectpicker-s').selectpicker();
+    $('.selectpicker-q').selectpicker();
+    $('.selectpicker-q').selectpicker('val', {{ questions_id }});
+    $('.selectpicker-q').selectpicker('refresh');
+    $('.selectpicker-s').selectpicker('val', {{ sets_id }});
+    $('.selectpicker-s').selectpicker('refresh');
+    $('#hidden_questions').val({{ questions_id }})
+    $('#hidden_sets').val({{ sets_id }})
+
+    $('#sets').change(function(){
+      $('#hidden_sets').val($('#sets').val());
+    });
+
+    $('#questions').change(function(){
+      $('#hidden_questions').val($('#questions').val());
+    });
+
+    $('#multiple_select_form').on('submit', function(event){
+        event.preventDefault();
+            var form_data = $(this).serialize();
+            $.ajax({
+                url:"/ajax_interview_add_questions/" + {{ interview.id }},
+                method:"POST",
+                data:form_data,
+                success:function(data)
+                {
+                window.location.href = "/interviews";
+                }
+            })
+    });
+});
+</script>
+{% endblock %}

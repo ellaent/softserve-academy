@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+{% block head %}
+  <link rel="stylesheet" href="/static/create_interview.css">
+{% endblock %}
+{% block body %}
+{% from "includes/_formhelpers.html" import render_field %}
+<div id="heading">
+  <div class="col">
+    <h1>Add user</h1>
+  </div>
+</div>
+<div class="login-box well">
+  <form method="POST" action={{url_for('helper.add_user')}} enctype="multipart/form-data">
+    <div class="form-group">
+      {{ render_field(form.name, class="form-control") }}
+    </div>
+    <div class="form-group">
+      {{ render_field(form.surname, class="form-control") }}
+    </div>
+    <div class="form-group">
+      {{ render_field(form.email, class="form-control") }}
+    </div>
+    <div class="form-group">
+      {{ render_field(form.role) }}
+    </div>
+    <p><input type="submit" class="btn btn-primary" value="Submit"></p>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+{% block head %}
+  <link rel="stylesheet" href="/static/create_interview.css">
+{% endblock %}
+{% block body %}
+{% from "includes/_formhelpers.html" import render_field %}
+<div id="heading">
+  <div class="col">
+    <h1>Edit Question</h1>
+  </div>
+</div>
+<div class="login-box well">
+  <form method="POST" action="{{url_for('helper.update_question', id=question.id)}}" enctype="multipart/form-data">
+    <div class="form-group">
+      {{ render_field(form.theme, class="form-control", value=question.theme) }}
+    </div>
+    <div class="form-group">
+      {{ render_field(form.essence, class="form-control", value=question.essence) }}
+    </div>
+    <div class="form-group">
+      {{ render_field(form.answer, class="form-control", value=question.answer) }}
+    </div>
+    <div class="form-group">
+      {{ render_field(form.mark, class="form-control", value=question.mark) }}
+    </div>
+    <p><input type="submit" class="btn btn-primary" value="Update"></p>
+  </form>
+</div>
+{% endblock %}

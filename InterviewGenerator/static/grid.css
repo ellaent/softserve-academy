@@ -1,0 +1,65 @@
+body {
+  background-color: #F0F0F4;
+  font-family: sans-serif;
+  line-height: 150%;
+}
+
+/* Setting up the responsive Grid container - auto-fit + minmax() */
+.albums {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin: 2em;
+  font-size: .8rem;
+}
+
+
+/* Grid inside grid - album cards also use grid for layout setup */
+.album {
+  background: #fff;
+  box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  padding: 1.5em;
+  border-radius: 1em;
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 1.5em;
+  align-items: center;
+  color: #222629;
+  font-weight: 100;
+}
+
+
+/* Important step - image will spill over the container if width is not declared explicitly */
+.album__artwork {
+  width: 100%;
+  border-radius: 0.4em;
+}
+
+
+/* Some additional text styling */
+h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.25em;
+}
+
+.album__artist {
+  opacity: 0.7;
+  text-transform: uppercase;
+  margin-bottom: .5em;
+  font-style: oblique;
+  letter-spacing: .7px;
+}
+
+.interview-filters {
+    margin: 2em;
+}
+
+.archive {
+    color: #6a63dd;
+    margin-left: 10px;
+}
+
+.archive:hover {
+    color: rgb(169, 99, 221, 0.7);
+}

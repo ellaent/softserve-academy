@@ -1,0 +1,73 @@
+{% extends 'layout.html' %}
+{% block head %}
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
+  <link rel="stylesheet" href="/static/common.css">
+  <link rel="stylesheet" href="/static/create_interview.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
+{% endblock %}
+{% block body %}
+{% from "includes/_formhelpers.html" import render_field %}
+<div id="heading">
+  <div class="col">
+    <h1>Create Interview</h1>
+  </div>
+</div>
+<div class="login-box well">
+  <form method="POST" enctype="multipart/form-data" id="multiple_select_form">
+    Assignee
+    <div class="form-group">
+      <input name="assignee" type="text" class="form-control" required/>
+    </div>
+    Position
+    <div class="form-group">
+      <input name="position" type="text" class="form-control" required/>
+    </div>
+    Experts
+    <div class="form-group">
+    <select name="experts" id="experts" class="form-control selectpicker" data-live-search="true" multiple required>
+      {% for expert in experts %}
+      <option value="{{expert.id}}">{{expert}}</option>
+      {% endfor %}
+    </select>
+    </div>
+    <br /><br />
+    <div class="form-group">
+    <input type="hidden" name="hidden_experts" id="hidden_experts" />
+    <p><input type="submit" name="submit" class="btn btn-primary" value="Submit" /></p>
+  </form>
+</div>
+<script>
+$(document).ready(function(){
+    $('.selectpicker').selectpicker();
+
+    $('#experts').change(function(){
+      $('#hidden_experts').val($('#experts').val());
+    });
+
+    $('#multiple_select_form').on('submit', function(event){
+        event.preventDefault();
+        if($('#experts').val() != '')
+        {
+            var form_data = $(this).serialize();
+            $.ajax({
+                url:"/add_interview",
+                method:"POST",
+                data:form_data,
+                success:function(data)
+                {
+                window.location.href = "/dashboard";
+                }
+            })
+        }
+        else
+        {
+            alert("Please select framework");
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}
